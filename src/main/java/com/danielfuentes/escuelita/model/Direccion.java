@@ -16,6 +16,6 @@ public class Direccion {
     private String direccion;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_id")
-    private Usuario usuario;
+    @JoinColumn(name = "usuario_id", referencedColumnName = "id")
+    private Usuario usuarios;
 }

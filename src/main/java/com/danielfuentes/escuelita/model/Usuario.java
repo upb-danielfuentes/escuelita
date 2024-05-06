@@ -16,6 +16,6 @@ public class Usuario {
     private String nombre;
     private String email;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "usuarios", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<Direccion> direcciones;
 }

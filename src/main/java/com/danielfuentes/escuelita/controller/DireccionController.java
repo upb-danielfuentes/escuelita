@@ -38,7 +38,7 @@ public class DireccionController {
         return direccionService.getDireccionById(id)
                 .map(direccionExistente -> {
                     direccionExistente.setDireccion(nuevaDireccion.getDireccion());
-                    direccionExistente.setUsuario(nuevaDireccion.getUsuario());  // Asegúrate de actualizar la relación correctamente
+                    direccionExistente.setUsuarios(nuevaDireccion.getUsuarios());  // Asegúrate de actualizar la relación correctamente
                     direccionService.saveDireccion(direccionExistente);
                     return ResponseEntity.ok(direccionExistente);
                 })
