@@ -21,3 +21,41 @@ create table usuarios
         unique (email)
 );
 
+CREATE TABLE Estudiantes (
+                             id INT AUTO_INCREMENT PRIMARY KEY,
+                             nombre VARCHAR(100) NOT NULL,
+                             apellido VARCHAR(100) NOT NULL,
+                             codigo VARCHAR(50) NOT NULL,
+                             activo BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE TABLE Cursos (
+                        id INT AUTO_INCREMENT PRIMARY KEY,
+                        nombre VARCHAR(100) NOT NULL,
+                        descripcion TEXT,
+                        duracion INT,
+                        activo BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE TABLE Materias (
+                          id INT AUTO_INCREMENT PRIMARY KEY,
+                          nombre VARCHAR(100) NOT NULL,
+                          profesor VARCHAR(100),
+                          carga_horaria INT
+);
+
+CREATE TABLE Estudiantes_Cursos (
+                                    estudiante_id INT,
+                                    curso_id INT,
+                                    FOREIGN KEY (estudiante_id) REFERENCES Estudiantes(id),
+                                    FOREIGN KEY (curso_id) REFERENCES Cursos(id),
+                                    PRIMARY KEY (estudiante_id, curso_id)
+);
+
+CREATE TABLE Cursos_Materias (
+                                 curso_id INT,
+                                 materia_id INT,
+                                 FOREIGN KEY (curso_id) REFERENCES Cursos(id),
+                                 FOREIGN KEY (materia_id) REFERENCES Materias(id),
+                                 PRIMARY KEY (curso_id, materia_id)
+);
