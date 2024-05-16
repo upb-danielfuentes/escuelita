@@ -26,5 +26,13 @@ public class Materia {
 
     @OneToMany(mappedBy = "materia")
     private Set<CursoMateria> cursos;
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 }
 
