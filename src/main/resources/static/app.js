@@ -249,6 +249,7 @@ $(document).ready(function() {
                 y += 10;
             });
         }
-        doc.save('lista-datos-dummy-escuelita.pdf');
+
+        doc.save('lista-datos.pdf');
     });
 });
