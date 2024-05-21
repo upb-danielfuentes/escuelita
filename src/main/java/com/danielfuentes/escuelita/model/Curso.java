@@ -41,14 +41,6 @@ public class Curso {
         this.id = id;
     }
 
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-
     public String getNombre() {
         return nombre;
     }

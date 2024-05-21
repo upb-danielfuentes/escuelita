@@ -8,17 +8,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-@Service
-public class CursoService {
-
-    @Autowired
-    private CursoRepository cursoRepository;
-
-    public List<Curso> findCursosByEstudianteId(Long estudianteId) {
-        return cursoRepository.findByEstudiantes_Estudiante_Id(estudianteId);
-    }
-
-    public Optional<Curso> findCursoById(Long id) {
-        return cursoRepository.findById(id);
-    }
+public interface CursoService {
+    List<Curso> findAllCursos();
+    Optional<Curso> findCursoById(Long id);
+    Curso saveCurso(Curso curso);
+    Curso updateCurso(Long id, Curso curso);
+    void deleteCurso(Long id);
 }

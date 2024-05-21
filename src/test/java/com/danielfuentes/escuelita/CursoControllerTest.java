@@ -3,66 +3,126 @@ package com.danielfuentes.escuelita;
 import com.danielfuentes.escuelita.controller.CursoController;
 import com.danielfuentes.escuelita.model.Curso;
 import com.danielfuentes.escuelita.service.CursoService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.ResponseEntity;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(MockitoExtension.class)
-public class CursoControllerTest {
+class CursoControllerTest {
 
-    @InjectMocks
-    private CursoController cursoController;
+    private MockMvc mockMvc;
 
     @Mock
     private CursoService cursoService;
 
-    @Test
-    public void whenGetCursosByEstudianteId_thenReturnCursoList() {
-        Curso curso1 = new Curso(); curso1.setNombre("Math");
-        Curso curso2 = new Curso(); curso2.setNombre("Science");
-        List<Curso> expectedCursos = Arrays.asList(curso1, curso2);
-        when(cursoService.findCursosByEstudianteId(1L)).thenReturn(expectedCursos);
+    @InjectMocks
+    private CursoController cursoController;
 
-        ResponseEntity<List<Curso>> response = cursoController.getCursosByEstudianteId(1L);
-
-        assertNotNull(response.getBody());
-        assertEquals(2, response.getBody().size());
-        assertEquals("Math", response.getBody().get(0).getNombre());
-        verify(cursoService).findCursosByEstudianteId(1L);
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        this.mockMvc = MockMvcBuilders.standaloneSetup(cursoController).build();
     }
 
     @Test
-    public void whenGetCursoById_thenReturnCurso() {
-        Curso expectedCurso = new Curso();
-        expectedCurso.setId(1L);
-        expectedCurso.setNombre("Math");
-        when(cursoService.findCursoById(1L)).thenReturn(Optional.of(expectedCurso));
+    void getAllCursos() throws Exception {
+        Curso curso = new Curso();
+        curso.setNombre("Matemáticas");
+        curso.setDescripcion("Curso de matemáticas básicas");
+        curso.setDuracion(120);
+        curso.setActivo(true);
 
-        ResponseEntity<Curso> response = cursoController.getCursoById(1L);
+        when(cursoService.findAllCursos()).thenReturn(Arrays.asList(curso));
 
-        assertNotNull(response.getBody());
-        assertEquals(1L, response.getBody().getId());
-        assertEquals("Math", response.getBody().getNombre());
-        verify(cursoService).findCursoById(1L);
+        mockMvc.perform(get("/api/cursos"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].nombre").value("Matemáticas"))
+                .andExpect(jsonPath("$[0].descripcion").value("Curso de matemáticas básicas"))
+                .andExpect(jsonPath("$[0].duracion").value(120))
+                .andExpect(jsonPath("$[0].activo").value(true));
+
+        verify(cursoService, times(1)).findAllCursos();
     }
 
     @Test
-    public void whenGetCursoById_notFound_thenReturnNotFound() {
-        when(cursoService.findCursoById(1L)).thenReturn(Optional.empty());
+    void getCursoById() throws Exception {
+        Curso curso = new Curso();
+        curso.setId(1L);
+        curso.setNombre("Matemáticas");
+        curso.setDescripcion("Curso de matemáticas básicas");
+        curso.setDuracion(120);
 
-        ResponseEntity<Curso> response = cursoController.getCursoById(1L);
+        when(cursoService.findCursoById(1L)).thenReturn(Optional.of(curso));
 
-        assertEquals(ResponseEntity.notFound().build(), response);
-        verify(cursoService).findCursoById(1L);
+        mockMvc.perform(get("/api/cursos/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nombre").value("Matemáticas"))
+                .andExpect(jsonPath("$.descripcion").value("Curso de matemáticas básicas"))
+                .andExpect(jsonPath("$.duracion").value(120));
+
+        verify(cursoService, times(1)).findCursoById(1L);
+    }
+
+    @Test
+    void createCurso() throws Exception {
+        Curso curso = new Curso();
+        curso.setNombre("Matemáticas");
+        curso.setDescripcion("Curso de matemáticas básicas");
+        curso.setDuracion(120);
+
+        when(cursoService.saveCurso(any(Curso.class))).thenReturn(curso);
+
+        mockMvc.perform(post("/api/cursos")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nombre\": \"Matemáticas\", \"descripcion\": \"Curso de matemáticas básicas\", \"duracion\": 120}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nombre").value("Matemáticas"))
+                .andExpect(jsonPath("$.descripcion").value("Curso de matemáticas básicas"))
+                .andExpect(jsonPath("$.duracion").value(120));
+
+        verify(cursoService, times(1)).saveCurso(any(Curso.class));
+    }
+
+    @Test
+    void updateCurso() throws Exception {
+        Curso curso = new Curso();
+        curso.setId(1L);
+        curso.setNombre("Matemáticas");
+        curso.setDescripcion("Curso de matemáticas básicas");
+        curso.setDuracion(120);
+
+        when(cursoService.updateCurso(eq(1L), any(Curso.class))).thenReturn(curso);
+
+        mockMvc.perform(put("/api/cursos/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"nombre\": \"Matemáticas\", \"descripcion\": \"Curso de matemáticas básicas\", \"duracion\": 120}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.nombre").value("Matemáticas"))
+                .andExpect(jsonPath("$.descripcion").value("Curso de matemáticas básicas"))
+                .andExpect(jsonPath("$.duracion").value(120));
+
+        verify(cursoService, times(1)).updateCurso(eq(1L), any(Curso.class));
+    }
+
+    @Test
+    void deleteCurso() throws Exception {
+        doNothing().when(cursoService).deleteCurso(1L);
+
+        mockMvc.perform(delete("/api/cursos/1"))
+                .andExpect(status().isNoContent());
+
+        verify(cursoService, times(1)).deleteCurso(1L);
     }
 }

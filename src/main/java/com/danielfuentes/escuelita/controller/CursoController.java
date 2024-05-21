@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -15,10 +16,10 @@ public class CursoController {
     @Autowired
     private CursoService cursoService;
 
-    // Obtener todos los cursos de un estudiante específico
-    @GetMapping("/estudiante/{estudianteId}")
-    public ResponseEntity<List<Curso>> getCursosByEstudianteId(@PathVariable Long estudianteId) {
-        List<Curso> cursos = cursoService.findCursosByEstudianteId(estudianteId);
+    // Obtener todos los cursos
+    @GetMapping
+    public ResponseEntity<List<Curso>> getAllCursos() {
+        List<Curso> cursos = cursoService.findAllCursos();
         return ResponseEntity.ok(cursos);
     }
 
@@ -28,5 +29,30 @@ public class CursoController {
         return cursoService.findCursoById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    // Crear un nuevo curso
+    @PostMapping
+    public ResponseEntity<Curso> createCurso(@Valid @RequestBody Curso curso) {
+        Curso createdCurso = cursoService.saveCurso(curso);
+        return ResponseEntity.ok(createdCurso);
+    }
+
+    // Actualizar un curso existente
+    @PutMapping("/{id}")
+    public ResponseEntity<Curso> updateCurso(@PathVariable Long id, @Valid @RequestBody Curso curso) {
+        try {
+            Curso updatedCurso = cursoService.updateCurso(id, curso);
+            return ResponseEntity.ok(updatedCurso);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    // Eliminar un curso
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCurso(@PathVariable Long id) {
+        cursoService.deleteCurso(id);
+        return ResponseEntity.noContent().build();
     }
 }

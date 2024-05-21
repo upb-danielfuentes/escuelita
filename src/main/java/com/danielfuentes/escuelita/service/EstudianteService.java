@@ -9,16 +9,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class EstudianteService {
-
-    @Autowired
-    private EstudianteRepository estudianteRepository;
-
-    public List<Estudiante> findAllActiveEstudiantes() {
-        return estudianteRepository.findByActivo(true);
-    }
-
-    public Optional<Estudiante> findEstudianteById(Long id) {
-        return estudianteRepository.findById(id);
-    }
+public interface EstudianteService {
+    List<Estudiante> findAllActiveEstudiantes();
+    Optional<Estudiante> findEstudianteById(Long id);
+    Estudiante saveEstudiante(Estudiante estudiante);
+    Estudiante updateEstudiante(Long id, Estudiante estudiante);
+    void deleteEstudiante(Long id);
 }
